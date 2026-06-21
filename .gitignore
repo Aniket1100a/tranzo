@@ -1,0 +1,109 @@
+# ============================================================
+#  TRANZO — Root .gitignore
+# ============================================================
+
+# ── IDE / Editor ────────────────────────────────────────────
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# ── OS generated ────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── Logs ────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================================
+#  BACKEND  (Django / Python)
+# ============================================================
+
+# Virtual environment
+backend/venv/
+backend/.venv/
+backend/env/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Django
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+backend/static_collected/
+
+# Environment variables
+backend/.env
+# keep the example file
+!backend/.env.example
+
+# Django migrations (optional — remove these lines if you want to track migrations)
+# backend/**/migrations/*.py
+# !backend/**/migrations/__init__.py
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Coverage / testing
+.coverage
+htmlcov/
+.pytest_cache/
+*.xml
+
+# MyPy / type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ============================================================
+#  FRONTEND  (Vite + React + TypeScript)
+# ============================================================
+
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/coverage/
+
+# Environment variables
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+# keep the example file
+!frontend/.env.example
+
+# TypeScript build info
+frontend/*.tsbuildinfo
+
+# ============================================================
+#  Misc
+# ============================================================
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# Secrets / certs
+*.pem
+*.key
+*.crt
