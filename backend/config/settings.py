@@ -17,12 +17,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-this-in-production")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+# Render automatically sets RENDER_EXTERNAL_HOSTNAME to the service's public URL
+RENDER_EXTERNAL_HOSTNAME = os.getenv("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# Also support comma-separated ALLOWED_HOSTS env var for custom domains
 _ALLOWED_HOSTS_ENV = os.getenv("ALLOWED_HOSTS", "")
-ALLOWED_HOSTS = (
-    [h.strip() for h in _ALLOWED_HOSTS_ENV.split(",") if h.strip()]
-    if _ALLOWED_HOSTS_ENV
-    else [".vercel.app", ".render.com", "localhost", "127.0.0.1"]
-)
+if _ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS += [h.strip() for h in _ALLOWED_HOSTS_ENV.split(",") if h.strip()]
 
 # APPLICATIONS
 INSTALLED_APPS = [
