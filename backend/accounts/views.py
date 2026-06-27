@@ -44,11 +44,8 @@ def register_customer(request):
 
         otp = generate_otp()
 
-        # Send email BEFORE creating database record
+        # Try to send email, but don't crash if it fails (common in cloud environments)
         email_sent = send_otp_email(email, serializer.validated_data["name"], otp)
-
-        if not email_sent:
-            return Response({"error": "Failed to send verification email. Please check if the email address is valid."}, status=400)
 
         # Temporarily store registration data in cache (expires in 15 mins)
         cache_key = f"registration_{email}"
@@ -60,10 +57,13 @@ def register_customer(request):
         }
         cache.set(cache_key, registration_data, timeout=900)
 
+        message = "OTP sent to your email." if email_sent else "Verification required. (Development: Check server logs for OTP)"
+
         return Response({
-            "message": "OTP sent to your email. Verification required to complete registration.",
+            "message": message,
             "email": email,
-            "role": "customer"
+            "role": "customer",
+            "email_sent": email_sent
         }, status=201)
     return Response(serializer.errors, status=400)
 
@@ -82,11 +82,8 @@ def register_driver(request):
 
         otp = generate_otp()
 
-        # Send email BEFORE creating database record
+        # Try to send email
         email_sent = send_otp_email(email, serializer.validated_data["name"], otp)
-
-        if not email_sent:
-            return Response({"error": "Failed to send verification email. Please check if the email address is valid."}, status=400)
 
         # Temporarily store registration data in cache (expires in 15 mins)
         cache_key = f"registration_{email}"
@@ -98,10 +95,13 @@ def register_driver(request):
         }
         cache.set(cache_key, registration_data, timeout=900)
 
+        message = "OTP sent to your email." if email_sent else "Verification required. (Development: Check server logs for OTP)"
+
         return Response({
-            "message": "OTP sent to your email. Verification required to complete registration.",
+            "message": message,
             "email": email,
-            "role": "driver"
+            "role": "driver",
+            "email_sent": email_sent
         }, status=201)
     return Response(serializer.errors, status=400)
 
@@ -220,12 +220,9 @@ def resend_otp(request):
     name = reg_data.get("data", {}).get("name", "User")
     email_sent = send_otp_email(email, name, new_otp)
 
-    if not email_sent:
-        return Response({"error": "Failed to send email. Please check the address."}, status=500)
-
     return Response({
-        "message": "New OTP sent successfully",
-        "email_sent": True
+        "message": "New OTP generated successfully",
+        "email_sent": email_sent
     }, status=200)
 
 @extend_schema(request=LoginSerializer, responses={200: LoginResponseSerializer})
@@ -284,9 +281,6 @@ def request_password_change(request):
     otp = generate_otp()
     email_sent = send_otp_email(email, request.user.name, otp)
 
-    if not email_sent:
-        return Response({"error": "Failed to send verification email."}, status=500)
-
     cache_key = f"password_change_otp_{email}"
     cache.set(cache_key, {
         "otp": otp,
@@ -294,4 +288,7 @@ def request_password_change(request):
         "created_at": timezone.now().timestamp()
     }, timeout=900)
 
-    return Response({"message": "OTP sent to your email for verification."}, status=200)
+    return Response({
+        "message": "OTP generated for verification.",
+        "email_sent": email_sent
+    }, status=200)
