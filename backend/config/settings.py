@@ -24,10 +24,13 @@ RENDER_EXTERNAL_HOSTNAME = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# Also support comma-separated ALLOWED_HOSTS env var for custom domains
-_ALLOWED_HOSTS_ENV = os.getenv("ALLOWED_HOSTS", "")
+# Support ALLOWED_HOSTS (comma-separated) or ALLOWED_HOST (from user's Render config)
+_ALLOWED_HOSTS_ENV = os.getenv("ALLOWED_HOSTS") or os.getenv("ALLOWED_HOST", "")
 if _ALLOWED_HOSTS_ENV:
-    ALLOWED_HOSTS += [h.strip() for h in _ALLOWED_HOSTS_ENV.split(",") if h.strip()]
+    for host in _ALLOWED_HOSTS_ENV.split(","):
+        clean_host = host.strip()
+        if clean_host and clean_host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(clean_host)
 
 # APPLICATIONS
 INSTALLED_APPS = [
@@ -120,7 +123,8 @@ AUTH_USER_MODEL = "accounts.User"
 # CORS & CSRF
 CORS_ALLOW_ALL_ORIGINS = DEBUG # All origins allowed only in DEBUG mode
 if not DEBUG:
-    FRONTEND_URL = os.getenv("FRONTEND_URL", "")
+    # .rstrip("/") removes the trailing slash which causes the corsheaders.E014 error
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "").rstrip("/")
     if FRONTEND_URL:
         CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
         CSRF_TRUSTED_ORIGINS = [FRONTEND_URL]
