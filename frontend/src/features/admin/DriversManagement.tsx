@@ -109,7 +109,8 @@ export function DriversManagement() {
   const getFullUrl = (path: string | null) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
-    return `http://127.0.0.1:8000${path}`;
+    const baseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+    return `${baseUrl}${path}`;
   };
 
   const getInitials = (name: string) => {
@@ -339,7 +340,7 @@ export function DriversManagement() {
            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full h-[85vh] flex flex-col overflow-hidden animate-in zoom-in duration-300">
               <div className="px-6 py-4 bg-[#0F172A] text-white flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                   <div className="p-2 bg-amber-500 rounded-xl text-[#0F172A]">
+                   <div className="p-2 bg-amber-50 rounded-xl text-[#0F172A]">
                       <Eye size={18} strokeWidth={3} />
                    </div>
                    <h3 className="text-sm font-black uppercase tracking-widest">{previewDoc.label} Verification</h3>

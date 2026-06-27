@@ -24,10 +24,8 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      // Use window.location.href sparingly or use a store to trigger redirect
       if (!window.location.pathname.includes('/auth/')) {
          window.location.href = "/auth/login";
       }
